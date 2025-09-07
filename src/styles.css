@@ -26,7 +26,7 @@ body{
   color-scheme: dark;
 }
 
-/* Enlaces: evitar el morado de visited y usar el color de marca */
+
 a{ color: var(--brand); text-decoration: none; }
 a:hover{ text-decoration: underline; }
 a:visited{ color: var(--brand); }
