@@ -1,108 +1,13 @@
-const products = [
-  {
-    id: '1',
-    title: 'iPhone 14',
-    description: 'Smartphone de alta gama',
-    price: 1199,
-    stock: 5,
-    category: 'celulares',
-    image: '/src/Props/iPhone-14.webp',
-  },
-  {
-    id: '2',
-    title: 'Samsung Galaxy S23',
-    description: 'Android flagship',
-    price: 999,
-    stock: 7,
-    category: 'celulares',
-    image: '/src/Props/Samsung-Galaxy-S23.webp',
-  },
-  {
-    id: '3',
-    title: 'Xiaomi Redmi Note 12',
-    description: 'Relacion calidad/precio imbatible',
-    price: 349,
-    stock: 12,
-    category: 'celulares',
-    image: '/src/Props/Xiaomi-Redmi-Note-12.webp',
-  },
-  {
-    id: '4',
-    title: 'MacBook Air M2',
-    description: 'Ultraliviana y potente',
-    price: 1499,
-    stock: 4,
-    category: 'notebooks',
-    image: '/src/Props/MacBook-Air-M2.webp',
-  },
-  {
-    id: '5',
-    title: 'Lenovo IdeaPad 5',
-    description: 'Notebook versátil para el día a día',
-    price: 799,
-    stock: 9,
-    category: 'notebooks',
-    image: '/src/Props/Lenovo-IdeaPad-5.webp',
-  },
-  {
-    id: '6',
-    title: 'Asus ROG Strix',
-    description: 'Notebook gamer alta performance',
-    price: 1899,
-    stock: 3,
-    category: 'notebooks',
-    image: '/src/Props/Asus-ROG-Strix.webp',
-  },
-  {
-    id: '7',
-    title: 'Auriculares Bluetooth',
-    description: 'Con cancelación de ruido',
-    price: 129,
-    stock: 15,
-    category: 'accesorios',
-    image: '/src/Props/Auriculares-Bluetooth-Sony.webp',
-  },
-  {
-    id: '8',
-    title: 'Cargador 65W',
-    description: 'Carga rápida USB-C',
-    price: 39,
-    stock: 25,
-    category: 'accesorios',
-    image: '/src/Props/Cargador-65W.webp',
-  },
-  {
-    id: '9',
-    title: 'Mouse Inalámbrico',
-    description: 'Ergonómico y silencioso',
-    price: 25,
-    stock: 30,
-    category: 'accesorios',
-    image: '/src/Props/Mouse-Inalámbrico.webp',
-  },
+// src/data/products.js
+export const products = [
+  { id:"asus-rog-strix", title:"ASUS ROG Strix", price:2499, stock:5, category:"laptops", image:"/images/Asus-ROG-Strix.webp", description:"Laptop gamer." },
+  { id:"lenovo-ideapad-5", title:"Lenovo IdeaPad 5", price:899, stock:8, category:"laptops", image:"/images/Lenovo-IdeaPad-5.webp", description:"Ultrabook liviana." },
+  { id:"macbook-air-m2", title:"MacBook Air M2", price:1399, stock:6, category:"laptops", image:"/images/MacBook-Air-M2.webp", description:"Potente y silenciosa." },
+  { id:"iphone-14", title:"iPhone 14", price:799, stock:10, category:"phones", image:"/images/iPhone-14.webp", description:"Cámara avanzada." },
+  { id:"samsung-galaxy-s23", title:"Samsung Galaxy S23", price:749, stock:12, category:"phones", image:"/images/Samsung-Galaxy-S23.webp", description:"AMOLED y rendimiento." },
+  { id:"xiaomi-redmi-note-12", title:"Xiaomi Redmi Note 12", price:229, stock:20, category:"phones", image:"/images/Xiaomi-Redmi-Note-12.webp", description:"Gran precio/calidad." },
+  { id:"sony-bluetooth", title:"Auriculares Sony Bluetooth", price:169, stock:15, category:"audio", image:"/images/Auriculares-Bluetooth-Sony.webp", description:"Cancelación de ruido." },
+  { id:"logitech-g305", title:"Mouse Inalámbrico Logitech G305", price:49, stock:30, category:"peripherals", image:"/images/Mouse-Inalámbrico.webp", description:"Ligero y preciso." },
+  { id:"samsung-65w", title:"Cargador Samsung 65W Trio", price:59, stock:25, category:"peripherals", image:"/images/Cargador-65W.webp", description:"3 puertos." }
 ];
-
-export function getCategories() {
-  return [...new Set(products.map((p) => p.category))];
-}
-
-export function getProducts(categoryId) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (categoryId) {
-        resolve(products.filter((p) => p.category === categoryId));
-      } else {
-        resolve(products);
-      }
-    }, 600);
-  });
-}
-
-export function getProductById(id) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const found = products.find((p) => p.id === id);
-      resolve(found || null);
-    }, 600);
-  });
-}
+export default products;

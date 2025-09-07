@@ -3,26 +3,23 @@ import { useCart } from "../context/CartContext.jsx";
 import CartItem from "./CartItem.jsx";
 
 export default function Cart() {
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, clear, totalPrice } = useCart();
+
   if (!items.length) {
-    return (
-      <div className="container">
-        <h3>Carrito vacío</h3>
-        <Link className="btn btn-primary mt-2" to="/">Ir al catálogo</Link>
-      </div>
-    );
+    return <p className="app-container">El carrito está vacío.</p>;
   }
+
   return (
-    <div className="container">
-      <h3 className="mb-3">Tu carrito</h3>
-      <div className="list-group mb-3">
-        {items.map((p) => <CartItem key={p.id} item={p} />)}
+    <div className="app-container">
+      <div className="cartlist">
+        {items.map((it) => <CartItem key={it.id} item={it} />)}
       </div>
-      <div className="d-flex justify-content-between align-items-center">
-        <h4>Total: ${totalPrice.toFixed(2)}</h4>
-        <div className="d-flex gap-2">
-          <button className="btn btn-outline-danger" onClick={clearCart}>Vaciar</button>
-          <Link className="btn btn-success" to="/checkout">Finalizar compra</Link>
+
+      <div className="toolbar">
+        <strong>Total: ${totalPrice}</strong>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button className="btn" onClick={clear}>Vaciar</button>
+          <Link className="btn-primary" to="/checkout">Ir al checkout</Link>
         </div>
       </div>
     </div>

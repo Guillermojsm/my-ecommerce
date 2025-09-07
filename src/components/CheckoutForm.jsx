@@ -1,90 +1,66 @@
 import { useState } from "react";
-import { addDoc, collection, serverTimestamp, writeBatch, doc, increment } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/config.js";
 import { useCart } from "../context/CartContext.jsx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function CheckoutForm() {
-  const { items, totalPrice, clearCart } = useCart();
-  const [form, setForm] = useState({ name: "", phone: "", email: "" });
-  const [submitting, setSubmitting] = useState(false);
-  const [orderId, setOrderId] = useState(null);
+  const { items, totalPrice, clear } = useCart();
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+  const navigate = useNavigate();
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  if (!items.length)
+    return (
+      <p className="app-container">
+        Tu carrito está vacío. <Link to="/cart">Volver</Link>
+      </p>
+    );
 
-  const handleSubmit = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    if (!items.length) return;
-    setSubmitting(true);
-
+    setErr("");
+    setLoading(true);
     try {
-      // 1) Disminuir stock en batch
-      const batch = writeBatch(db);
-      items.forEach((it) => {
-        batch.update(doc(db, "products", it.id), { stock: increment(-it.quantity) });
-      });
-      await batch.commit();
-
-      // 2) Crear orden
-      const order = {
-        buyer: form,
-        items: items.map((i) => ({ id: i.id, title: i.title, price: i.price, quantity: i.quantity })),
+      const form = new FormData(e.currentTarget);
+      const buyer = {
+        name: form.get("name"),
+        email: form.get("email"),
+        phone: form.get("phone"),
+      };
+      const ordersRef = collection(db, "orders");
+      const docRef = await addDoc(ordersRef, {
+        buyer,
+        items,
         total: totalPrice,
         createdAt: serverTimestamp(),
-      };
-      const ref = await addDoc(collection(db, "orders"), order);
-      setOrderId(ref.id);
-      clearCart();
-    } catch (err) {
-      console.error(err);
-      alert("Ocurrió un error al generar la orden");
+      });
+      clear();
+      navigate(`/`);
+      alert(`Orden creada: ${docRef.id}`);
+    } catch (e2) {
+      setErr(e2?.message || "Error al procesar la orden");
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
-  if (!items.length && orderId) {
-    return (
-      <div className="container">
-        <h3>¡Gracias por tu compra!</h3>
-        <p>Tu id de orden es: <strong>{orderId}</strong></p>
-        <Link to="/" className="btn btn-primary">Volver al inicio</Link>
-      </div>
-    );
-  }
-
-  if (!items.length) {
-    return (
-      <div className="container">
-        <p>El carrito está vacío.</p>
-        <Link to="/" className="btn btn-primary">Ir al catálogo</Link>
-      </div>
-    );
-  }
-
   return (
-    <div className="container">
-      <h3>Checkout</h3>
-      <p className="text-muted">Total a pagar: ${totalPrice.toFixed(2)}</p>
-      <form onSubmit={handleSubmit} className="row g-3">
-        <div className="col-md-6">
-          <label className="form-label">Nombre</label>
-          <input className="form-control" required name="name" value={form.name} onChange={handleChange} />
-        </div>
-        <div className="col-md-6">
-          <label className="form-label">Teléfono</label>
-          <input className="form-control" required name="phone" value={form.phone} onChange={handleChange} />
-        </div>
-        <div className="col-12">
-          <label className="form-label">Email</label>
-          <input type="email" className="form-control" required name="email" value={form.email} onChange={handleChange} />
-        </div>
-        <div className="col-12 d-flex gap-2">
-          <button disabled={submitting} className="btn btn-success" type="submit">
-            {submitting ? "Generando orden..." : "Confirmar compra"}
-          </button>
-          <Link to="/cart" className="btn btn-outline-secondary">Volver al carrito</Link>
-        </div>
+    <div className="app-container">
+      <form className="form" onSubmit={onSubmit}>
+        <h2>Checkout</h2>
+        <div>Total a pagar: ${totalPrice}</div>
+
+        <input className="input" name="name" placeholder="Nombre" required />
+        <input className="input" name="email" type="email" placeholder="Email" required />
+        <input className="input" name="phone" placeholder="Teléfono" required />
+
+        {err && <div style={{ color: "#ffb4b4" }}>{err}</div>}
+
+        <button className="btn-primary" disabled={loading}>
+          {loading ? "Generando orden..." : "Finalizar compra"}
+        </button>
+        <Link className="btn" to="/cart">Volver al carrito</Link>
       </form>
     </div>
   );

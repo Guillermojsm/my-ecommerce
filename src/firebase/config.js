@@ -1,3 +1,4 @@
+// src/firebase/config.js
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
@@ -10,5 +11,22 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FB_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+const missing = Object.entries(firebaseConfig)
+  .filter(([, v]) => !v)
+  .map(([k]) => k);
+
+if (missing.length) {
+  console.warn("Faltan variables de entorno en .env.local:", missing);
+}
+
+let app = null;
+try {
+  if (!missing.length) {
+    app = initializeApp(firebaseConfig);
+    console.log("[DEBUG] projectId =", firebaseConfig.projectId);
+  }
+} catch (e) {
+  console.error("Error inicializando Firebase:", e);
+}
+
+export const db = app ? getFirestore(app) : null;
