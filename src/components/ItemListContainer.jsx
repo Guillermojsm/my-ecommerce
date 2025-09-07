@@ -1,39 +1,32 @@
-// src/components/ItemListContainer.jsx
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { getProducts } from '../data/products';
-import ItemList from './ItemList';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { db } from "../firebase/config.js";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import ItemList from "./ItemList.jsx";
 
-function ItemListContainer({ greeting = 'Catálogo de productos' }) {
+export default function ItemListContainer() {
   const { categoryId } = useParams();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let cancelled = false;
+    let q;
+    const ref = collection(db, "products");
+    q = categoryId ? query(ref, where("category", "==", categoryId)) : ref;
     setLoading(true);
-    getProducts(categoryId).then((data) => {
-      if (!cancelled) {
+    getDocs(q)
+      .then((snap) => {
+        const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         setItems(data);
-        setLoading(false);
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
+      })
+      .finally(() => setLoading(false));
   }, [categoryId]);
 
-  if (loading) {
-    return <p style={{ padding: '1rem' }}>Cargando...</p>;
-  }
-
+  if (loading) return <p className="container">Cargando productos...</p>;
+  if (!items.length) return <p className="container">No hay productos para mostrar.</p>;
   return (
-    <section style={{ padding: '1rem' }}>
-      <h2 style={{ marginBottom: '1rem' }}>{greeting}</h2>
-      {categoryId && <p style={{ opacity: 0.7, marginBottom: '1rem' }}>Categoría: {categoryId}</p>}
-      <ItemList products={items} />
-    </section>
+    <div className="container">
+      <ItemList items={items} />
+    </div>
   );
 }
-
-export default ItemListContainer;

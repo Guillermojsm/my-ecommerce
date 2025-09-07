@@ -1,50 +1,35 @@
-import { Link, NavLink } from 'react-router-dom';
-import CartWidget from './CartWidget';
-import { getCategories } from '../data/products';
-
-const CATEGORY_LABELS = {
-  celulares: ' Smartphones',
-  notebooks: ' Laptops',
-  accesorios: ' Accesorios',
-};
-
-const CATEGORY_ORDER = ['celulares', 'notebooks', 'accesorios'];
-
-const labelFor = (slug) =>
-  CATEGORY_LABELS[slug] ?? slug.charAt(0).toUpperCase() + slug.slice(1);
+import { Link, NavLink } from "react-router-dom";
+import CartWidget from "./CartWidget.jsx";
 
 export default function NavBar() {
-  const raw = getCategories();
-
-  const categories = [...raw].sort((a, b) => {
-    const ai = CATEGORY_ORDER.indexOf(a);
-    const bi = CATEGORY_ORDER.indexOf(b);
-    return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
-  });
+  const categories = [
+    { id: "laptops", label: "Laptops" },
+    { id: "phones", label: "Celulares" },
+    { id: "audio", label: "Audio" },
+    { id: "peripherals", label: "Periféricos" },
+  ];
 
   return (
-    <header className="navbar">
-      <div className="navbar__inner">
-        <Link to="/" className="brand">TechnoLand</Link>
+    <nav className="navbar navbar-expand-lg bg-dark navbar-dark mb-4">
+      <div className="container">
+        <Link className="navbar-brand" to="/">My E‑commerce</Link>
+        <button className="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav" type="button">
+          <span className="navbar-toggler-icon"></span>
+        </button>
 
-        <nav className="nav">
-          <NavLink to="/" className={({ isActive }) => (isActive ? 'nav__link active' : 'nav__link')} end>
-            Inicio
-          </NavLink>
-
-          {categories.map((slug) => (
-            <NavLink
-              key={slug}
-              to={`/category/${encodeURIComponent(slug)}`}
-              className={({ isActive }) => (isActive ? 'nav__link active' : 'nav__link')}
-            >
-              {labelFor(slug)}
-            </NavLink>
-          ))}
-        </nav>
-
-        <CartWidget />
+        <div id="nav" className="collapse navbar-collapse">
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            {categories.map((c) => (
+              <li className="nav-item" key={c.id}>
+                <NavLink className="nav-link" to={`/category/${c.id}`}>
+                  {c.label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+          <CartWidget />
+        </div>
       </div>
-    </header>
+    </nav>
   );
 }

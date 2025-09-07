@@ -1,35 +1,26 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { getProductById } from '../data/products';
-import ItemDetail from './ItemDetail';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { db } from "../firebase/config.js";
+import { doc, getDoc } from "firebase/firestore";
+import ItemDetail from "./ItemDetail.jsx";
 
-function ItemDetailContainer() {
-  const { itemId } = useParams();
-  const [product, setProduct] = useState(null);
+export default function ItemDetailContainer() {
+  const { id } = useParams();
+  const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let cancelled = false;
     setLoading(true);
-    getProductById(itemId).then((data) => {
-      if (!cancelled) {
-        setProduct(data);
-        setLoading(false);
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [itemId]);
+    getDoc(doc(db, "products", id))
+      .then((snap) => snap.exists() ? setItem({ id: snap.id, ...snap.data() }) : setItem(null))
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  if (loading) return <p style={{ padding: '1rem' }}>Cargando...</p>;
-  if (!product) return <p style={{ padding: '1rem' }}>Producto no encontrado.</p>;
-
+  if (loading) return <p className="container">Cargando detalle...</p>;
+  if (!item) return <p className="container">Producto no encontrado.</p>;
   return (
-    <section style={{ padding: '1rem' }}>
-      <ItemDetail product={product} />
-    </section>
+    <div className="container">
+      <ItemDetail item={item} />
+    </div>
   );
 }
-
-export default ItemDetailContainer;

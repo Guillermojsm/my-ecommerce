@@ -1,22 +1,13 @@
-import ItemCard from './ItemCard';
+import ItemCard from "./ItemCard.jsx";
 
-function ItemList({ products }) {
-  if (!products.length) {
-    return <p>No hay productos para mostrar.</p>;
-  }
+export default function ItemList({ items }) {
   return (
-    <div
-      style={{
-        display: 'grid',
-        gap: '1rem',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-      }}
-    >
-      {products.map((p) => (
-        <ItemCard key={p.id} product={p} />
+    <div className="row g-3">
+      {items.map((p) => (
+        <div key={p.id} className="col-12 col-sm-6 col-lg-4">
+          <ItemCard item={p} />
+        </div>
       ))}
     </div>
   );
 }
-
-export default ItemList;
